@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Form</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to ensure responsive, aesthetic, and centered layout */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid #e2e8f0;
+        }
+        input {
+            border: 1px solid #cbd5e0;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+        button {
+            background-color: #6366f1;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-1px);
+        }
+        button:active {
+            background-color: #4338ca;
+            transform: translateY(0);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 1.5rem;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #22c55e; /* Green for success */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .message-box.error {
+            background-color: #ef4444; /* Red for error */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+        .fade-out {
+            animation: fadeOut 0.5s ease-in forwards 2.5s; /* Fade out after 2.5s delay */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 640px) {
+            .form-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            .grid-cols-2 {
+                grid-template-columns: 1fr; /* Stack columns on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="spinner"></div>
+        <span>Submitting...</span>
+    </div>
+
+    <div class="message-box" id="messageBox"></div>
+
+    <div class="form-container">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Student Registration</h2>
+        <p class="text-sm text-gray-600 mb-6 text-center">Please fill out the form below.</p>
+        <form id="registrationForm" class="space-y-6">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                <input type="text" id="name" name="name" placeholder="John Doe" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <p id="nameError" class="error-message hidden">Please enter your name.</p>
+            </div>
+            <div>
+                <label for="age" class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                <input type="number" id="age" name="age" placeholder="18" min="1" max="120" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <p id="ageError" class="error-message hidden">Please enter a valid age (1-120).</p>
+            </div>
+            <div>
+                <label for="class" class="block text-sm font-medium text-gray-700 mb-2">Class</label>
+                <input type="text" id="class" name="class" placeholder="12th Grade / B.Sc Computer Science" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <p id="classError" class="error-message hidden">Please enter your class.</p>
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                <input type="email" id="email" name="email" placeholder="john.doe@example.com" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <p id="emailError" class="error-message hidden">Please enter a valid email address.</p>
+            </div>
+            <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input type="tel" id="phone" name="phone" placeholder="123-456-7890" pattern="[0-9]{3}-?[0-9]{3}-?[0-9]{4}" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <p id="phoneError" class="error-message hidden">Please enter a valid 10-digit phone number (e.g., 123-456-7890 or 1234567890).</p>
+            </div>
+
+            <div class="flex justify-end mt-8">
+                <button type="submit" class="w-full sm:w-auto px-6 py-3">
+                    Submit Registration
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // *** IMPORTANT: This URL has been updated with the Apps Script Web App URL you provided. ***
+        const formActionUrl = 'https://script.google.com/macros/s/AKfycbxV4ltMAcC6k3ZxV19qTP6RCTk986n6vE6DGNV57yiAesl82RXSvbLiWc9LMmqDk3PWHg/exec';
+
+        const registrationForm = document.getElementById('registrationForm');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const messageBox = document.getElementById('messageBox');
+
+        // Function to show a message box (success/error)
+        function showMessageBox(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type}`; // Add type class for styling
+            messageBox.style.display = 'block';
+            messageBox.classList.add('fade-out'); // Add fade-out animation
+
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+                messageBox.classList.remove('fade-out');
+            }, 3000); // Hide after 3 seconds
+        }
+
+        // Client-side form validation and submission
+        registrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            let isValid = true;
+            const formData = new FormData(registrationForm);
+            const data = {}; // Object to hold validated form data
+
+            // Helper to show/hide error messages
+            const showError = (elementId, message) => {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+                isValid = false;
+            };
+            const hideError = (elementId) => {
+                document.getElementById(elementId).classList.add('hidden');
+            };
+
+            // Reset all error messages
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+
+            // Name validation
+            const name = formData.get('name').trim();
+            if (name === "") {
+                showError('nameError', 'Please enter your name.');
+            } else {
+                data.name = name;
+            }
+
+            // Age validation
+            const age = parseInt(formData.get('age'));
+            if (isNaN(age) || age < 1 || age > 120) {
+                showError('ageError', 'Please enter a valid age (1-120).');
+            } else {
+                data.age = age;
+            }
+
+            // Class validation
+            const studentClass = formData.get('class').trim();
+            if (studentClass === "") {
+                showError('classError', 'Please enter your class.');
+            } else {
+                data.class = studentClass;
+            }
+
+            // Email validation
+            const email = formData.get('email').trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email === "" || !emailRegex.test(email)) {
+                showError('emailError', 'Please enter a valid email address.');
+            } else {
+                data.email = email;
+            }
+
+            // Phone validation (simple 10-digit number, with or without hyphens)
+            const phone = formData.get('phone').trim();
+            const phoneRegex = /^\d{3}-?\d{3}-?\d{4}$/; // Allows 123-456-7890 or 1234567890
+            if (phone === "" || !phoneRegex.test(phone)) {
+                showError('phoneError', 'Please enter a valid 10-digit phone number (e.g., 123-456-7890).');
+            } else {
+                data.phone = phone;
+            }
+
+            // If all validations pass, proceed to submit to Google Apps Script
+            if (isValid) {
+                loadingOverlay.classList.remove('hidden'); // Show loading indicator
+                try {
+                    // Send data to Google Apps Script
+                    const response = await fetch(formActionUrl, {
+                        method: 'POST',
+                        mode: 'no-cors', // Required for Google Apps Script Web Apps when not expecting JSON response
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        // Convert data object to URL-encoded string
+                        body: new URLSearchParams(data).toString(),
+                    });
+
+                    // In 'no-cors' mode, the response object will be opaque.
+                    // We can't check response.ok or response.json().
+                    // Success is implied if the fetch completes without a network error.
+                    // Apps Script will handle success/failure server-side.
+                    showMessageBox("Form submitted successfully!");
+                    registrationForm.reset(); // Clear the form
+                } catch (error) {
+                    console.error("Error submitting form:", error);
+                    showMessageBox("Error submitting form. Please try again.", "error");
+                } finally {
+                    loadingOverlay.classList.add('hidden'); // Hide loading indicator
+                }
+            } else {
+                showMessageBox("Please correct the errors in the form.", "error");
+            }
+        });
+    </script>
+</body>
+</html>
