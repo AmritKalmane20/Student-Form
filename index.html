@@ -112,10 +112,6 @@
             from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateX(-50%) translateY(0); }
-            to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-        }
         .fade-out {
             animation: fadeOut 0.5s ease-in forwards 2.5s; /* Fade out after 2.5s delay */
         }
@@ -174,6 +170,12 @@
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 <p id="phoneError" class="error-message hidden">Please enter a valid 10-digit phone number (e.g., 123-456-7890 or 1234567890).</p>
             </div>
+            <div>
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                <input type="text" id="city" name="city" placeholder="New York" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <p id="cityError" class="error-message hidden">Please enter your city.</p>
+            </div>
 
             <div class="flex justify-end mt-8">
                 <button type="submit" class="w-full sm:w-auto px-6 py-3">
@@ -185,7 +187,7 @@
 
     <script>
         // *** IMPORTANT: This URL has been updated with the Apps Script Web App URL you provided. ***
-        const formActionUrl = 'https://script.google.com/macros/s/AKfycbxV4ltMAcC6k3ZxV19qTP6RCTk986n6vE6DGNV57yiAesl82RXSvbLiWc9LMmqDk3PWHg/exec';
+        const formActionUrl = 'https://script.google.com/macros/s/AKfycbzGcn7MvLKy15HHAW_dHXbAGDrUwxVNEqbJPrliks5-KpvcYeU9xgVRj6GVjY1_0oyq_Q/exec';
 
         const registrationForm = document.getElementById('registrationForm');
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -267,6 +269,17 @@
             } else {
                 data.phone = phone;
             }
+
+            // City validation
+            const city = formData.get('city').trim();
+            if (city === "") {
+                showError('cityError', 'Please enter your city.');
+            } else {
+                data.city = city;
+            }
+
+            // Add client-side timestamp as the last piece of data to be sent
+            data.timestamp = new Date().toLocaleString(); // Formats to a readable string like "6/13/2025, 10:00:00 PM"
 
             // If all validations pass, proceed to submit to Google Apps Script
             if (isValid) {
